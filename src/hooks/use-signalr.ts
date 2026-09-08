@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import signalRService from '../lib/signalr';
 import { useAuthStore } from '../stores/auth-store';
-import { isDemoMode } from '../lib/demo';
 import * as signalR from '@microsoft/signalr';
 
 export function useSignalR(roomId?: string) {
@@ -11,13 +10,7 @@ export function useSignalR(roomId?: string) {
   );
 
   useEffect(() => {
-    if (isDemoMode()) {
-      setState(signalR.HubConnectionState.Connected);
-      return;
-    }
-
     if (!token) return;
-
     let mounted = true;
 
     const connect = async () => {
@@ -51,14 +44,8 @@ export function useSignalR(roomId?: string) {
   return {
     state,
     isConnected: state === signalR.HubConnectionState.Connected,
-    on: (event: string, cb: (...args: any[]) => void) => {
-      if (!isDemoMode()) signalRService.on(event, cb);
-    },
-    off: (event: string, cb: (...args: any[]) => void) => {
-      if (!isDemoMode()) signalRService.off(event, cb);
-    },
-    invoke: async (method: string, ...args: any[]) => {
-      if (!isDemoMode()) return signalRService.invoke(method, ...args);
-    }
+    on: (event: string, cb: (...args: any[]) => void) => signalRService.on(event, cb),
+    off: (event: string, cb: (...args: any[]) => void) => signalRService.off(event, cb),
+    invoke: async (method: string, ...args: any[]) => signalRService.invoke(method, ...args),
   };
 }

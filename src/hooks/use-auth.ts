@@ -16,7 +16,6 @@ export function useAuth() {
     isLoading: store.isLoading,
     login: store.login,
     register: store.register,
-    demoLogin: store.demoLogin,
     logout: store.logout,
     updateProfile: store.updateProfile
   };

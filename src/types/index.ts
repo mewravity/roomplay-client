@@ -63,11 +63,14 @@ export interface RoomDetail extends Room {
 }
 
 export interface RoomMember {
+  id?: string;
   userId: string;
+  username?: string;
   displayName: string;
   avatarUrl?: string;
-  role: MemberRole;
-  joinedAt: string;
+  avatar?: string;
+  role: MemberRole | string;
+  joinedAt?: string;
   isOnline: boolean;
   isMuted: boolean;
   isVideoEnabled: boolean;
@@ -87,11 +90,16 @@ export interface Message {
   id: string;
   roomId: string;
   userId: string;
+  username?: string;
   displayName: string;
   avatarUrl?: string;
+  avatar?: string;
   content: string;
-  timestamp: string;
+  timestamp?: string;
+  createdAt?: string;
+  type?: string;
   isSystem: boolean;
+  isLocal?: boolean;
   replyToId?: string;
 }
 
@@ -100,6 +108,8 @@ export interface PlaybackState {
   currentTime: number;
   updatedAt: string;
   mediaId?: string;
+  mediaUrl?: string;
+  mediaTitle?: string;
   speed: number;
 }
 

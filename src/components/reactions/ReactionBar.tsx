@@ -1,9 +1,9 @@
-import { demoReactions } from '@/lib/demo';
+const REACTIONS = ['❤️', '😂', '😮', '😭', '😱', '🔥', '👏', '👍', '👎', '💀'];
 
 export default function ReactionBar({ onSelect }: { onSelect: (emoji: string) => void }) {
   return (
     <div className="bg-[#1a1a2e] border border-white/10 p-2 rounded-xl shadow-xl flex flex-wrap gap-1 w-[200px]">
-      {demoReactions.map(emoji => (
+      {REACTIONS.map(emoji => (
         <button
           key={emoji}
           onClick={() => onSelect(emoji)}

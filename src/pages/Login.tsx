@@ -11,7 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login, demoLogin } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,18 +22,6 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDemo = async () => {
-    setLoading(true);
-    try {
-      await demoLogin();
-      navigate('/dashboard');
-    } catch (err: any) {
-      toast.error('Demo login failed');
     } finally {
       setLoading(false);
     }
@@ -66,16 +54,6 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign In'}
           </Button>
         </form>
-
-        <div className="my-6 flex items-center">
-          <div className="flex-1 border-t border-white/10"></div>
-          <span className="px-3 text-sm text-slate-500">or</span>
-          <div className="flex-1 border-t border-white/10"></div>
-        </div>
-
-        <Button variant="outline" className="w-full border-violet-500/30 hover:bg-violet-500/10" onClick={handleDemo} disabled={loading}>
-          Explore Demo Mode
-        </Button>
 
         <div className="mt-6 text-center text-sm">
           <Link to="/signup" className="text-slate-400 hover:text-white transition-colors">Don't have an account? <span className="text-violet-400">Sign up</span></Link>

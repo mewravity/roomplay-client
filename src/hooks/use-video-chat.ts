@@ -1,15 +1,17 @@
 import { useState, useCallback } from 'react';
-import { isDemoMode } from '../lib/demo';
 
 export function useVideoChat() {
   const [isVideoEnabled, setIsVideoEnabled] = useState(false);
 
-  const enableVideo = useCallback(() => {
-    if (isDemoMode()) {
+  const enableVideo = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       setIsVideoEnabled(true);
-      return;
+      return stream;
+    } catch (e) {
+      console.error('Camera access failed:', e);
+      return null;
     }
-    setIsVideoEnabled(true);
   }, []);
 
   const disableVideo = useCallback(() => {

@@ -9,7 +9,6 @@ interface AuthState {
   isLoading: boolean;
   login: (data: any) => Promise<void>;
   register: (data: any) => Promise<void>;
-  demoLogin: () => Promise<void>;
   logout: () => void;
   updateProfile: (data: any) => Promise<void>;
   loadUser: () => Promise<void>;
@@ -41,27 +40,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  demoLogin: async () => {
-    try {
-      const res = await api.auth.demoLogin();
-      localStorage.setItem('roomplay_token', res.token);
-      set({ user: res.user, token: res.token, isAuthenticated: true });
-    } catch (error) {
-      console.warn('Server demo login error, using local fallback:', error);
-      const fallbackUser: User = {
-        id: 'demo-user-1',
-        username: 'demouser',
-        displayName: 'Demo User',
-        email: 'demo@demo.com',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demouser',
-        status: 'Watching with friends 🍿',
-        isOnline: true,
-      };
-      localStorage.setItem('roomplay_token', 'demo-session-token');
-      set({ user: fallbackUser, token: 'demo-session-token', isAuthenticated: true });
-    }
-  },
-
   logout: () => {
     localStorage.removeItem('roomplay_token');
     set({ user: null, token: null, isAuthenticated: false });
@@ -86,19 +64,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const user = await api.auth.getMe();
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
-      if (token === 'demo-session-token' || (token && token.length > 20)) {
-        const fallbackUser: User = {
-          id: 'demo-user-1',
-          username: 'demouser',
-          displayName: 'Demo User',
-          email: 'demo@demo.com',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demouser',
-          status: 'Watching with friends 🍿',
-          isOnline: true,
-        };
-        set({ user: fallbackUser, isAuthenticated: true, isLoading: false });
-        return;
-      }
       localStorage.removeItem('roomplay_token');
       set({ user: null, token: null, isAuthenticated: false, isLoading: false });
     }

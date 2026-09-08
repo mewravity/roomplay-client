@@ -1,31 +1,49 @@
 import { useEffect } from 'react';
 import { useRoomStore } from '../stores/room-store';
 import { useSignalR } from './use-signalr';
-import { isDemoMode } from '../lib/demo';
 
 export function usePlaybackSync(roomId: string) {
   const { playbackState, setPlaybackState } = useRoomStore();
   const signalr = useSignalR(roomId);
 
   useEffect(() => {
-    if (isDemoMode()) {
-      let isPlaying = true;
-      let time = 0;
-      const interval = setInterval(() => {
-        if (isPlaying) time += 1;
-        setPlaybackState({ isPlaying, currentTime: time, updatedAt: new Date().toISOString(), speed: 1 });
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-
-    const onUpdate = (state: any) => setPlaybackState(state);
+    const onUpdate = (state: any) => {
+      if (!state) return;
+      setPlaybackState({
+        isPlaying: !!state.isPlaying,
+        currentTime: state.currentTime || 0,
+        updatedAt: state.lastUpdated || new Date().toISOString(),
+        speed: state.playbackRate || 1,
+        mediaUrl: state.mediaUrl || undefined,
+        mediaTitle: state.mediaTitle || undefined,
+      });
+    };
     signalr.on('PlaybackUpdate', onUpdate);
-    return () => signalr.off('PlaybackUpdate', onUpdate);
+    signalr.on('SyncState', onUpdate);
+    return () => {
+      signalr.off('PlaybackUpdate', onUpdate);
+      signalr.off('SyncState', onUpdate);
+    };
   }, [roomId, signalr, setPlaybackState]);
 
-  const sync = (state: any) => {
+  const sync = async (state: any) => {
     setPlaybackState(state);
-    if (!isDemoMode()) signalr.invoke('UpdatePlayback', roomId, state);
+    // Hub has Play/Pause/Seek/ChangePlaybackRate — send intent-based calls
+    const wasPlaying = playbackState.isPlaying;
+    const wasTime = playbackState.currentTime;
+    try {
+      if (state.isPlaying && !wasPlaying) {
+        await signalr.invoke('Play', roomId, state.currentTime || 0);
+      } else if (!state.isPlaying && wasPlaying) {
+        await signalr.invoke('Pause', roomId, state.currentTime || 0);
+      } else if (Math.abs((state.currentTime || 0) - (wasTime || 0)) > 1.5) {
+        await signalr.invoke('Seek', roomId, state.currentTime || 0);
+      } else {
+        await signalr.invoke('ChangePlaybackRate', roomId, state.speed || 1);
+      }
+    } catch (e) {
+      // ignore — e.g. not host & no permission
+    }
   };
 
   return { playbackState, sync };

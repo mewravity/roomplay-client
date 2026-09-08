@@ -3,25 +3,28 @@ import Header from '@/components/layout/Header';
 import RoomCard from '@/components/room/RoomCard';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { isDemoMode, demoRooms } from '@/lib/demo';
+import { api } from '@/lib/api';
 
-const CATEGORIES = ['All', 'Movie', 'Anime', 'Gaming', 'Music', 'Screen Share'];
+const CATEGORIES = ['All', 'Movie', 'Anime', 'Gaming', 'Music', 'Other'];
 
 export default function Discover() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const [rooms, setRooms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isDemoMode()) {
-      setRooms(demoRooms.filter(r => r.privacy === 'Public' || true)); // Show all for demo
-    }
-  }, []);
-
-  const filtered = rooms.filter(r => 
-    (activeCategory === 'All' || r.category === activeCategory) &&
-    r.name.toLowerCase().includes(search.toLowerCase())
-  );
+    let mounted = true;
+    setLoading(true);
+    api.discover.rooms(
+      activeCategory === 'All' ? undefined : activeCategory,
+      search || undefined
+    )
+      .then(r => { if (mounted) setRooms(r); })
+      .catch(err => console.error('Discover load failed:', err))
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
+  }, [activeCategory, search]);
 
   return (
     <div className="min-h-screen bg-background text-white pb-20">
@@ -52,9 +55,11 @@ export default function Discover() {
           </div>
         </div>
 
-        {filtered.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-20 text-slate-400">Loading rooms...</div>
+        ) : rooms.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filtered.map(room => <RoomCard key={room.id} room={room} />)}
+            {rooms.map(room => <RoomCard key={room.id} room={room} />)}
           </div>
         ) : (
           <div className="text-center py-20 bg-surface rounded-xl border border-white/5">
