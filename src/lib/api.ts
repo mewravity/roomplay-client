@@ -90,6 +90,9 @@ export const api = {
     join: (id: string, data?: { password?: string }) => fetchApi(`/rooms/${id}/join`, { method: 'POST', body: JSON.stringify(data || {}) }),
     leave: (id: string) => fetchApi(`/rooms/${id}/leave`, { method: 'POST' }),
     members: async (id: string) => fetchApi<any[]>(`/rooms/${id}/members`),
+    getCredentials: async (id: string) => fetchApi<any[]>(`/rooms/${id}/credentials`),
+    addCredential: async (id: string, data: any) => fetchApi<any>(`/rooms/${id}/credentials`, { method: 'POST', body: JSON.stringify(data) }),
+    deleteCredential: async (id: string, credentialId: string) => fetchApi(`/rooms/${id}/credentials/${credentialId}`, { method: 'DELETE' }),
   },
   discover: {
     rooms: async (category?: string, search?: string) => {

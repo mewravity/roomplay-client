@@ -16,6 +16,7 @@ export function usePlaybackSync(roomId: string) {
         speed: state.playbackRate || 1,
         mediaUrl: state.mediaUrl || undefined,
         mediaTitle: state.mediaTitle || undefined,
+        screenShareUserId: state.screenShareUserId || null,
       });
     };
     signalr.on('PlaybackUpdate', onUpdate);

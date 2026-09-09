@@ -111,6 +111,7 @@ export interface PlaybackState {
   mediaUrl?: string;
   mediaTitle?: string;
   speed: number;
+  screenShareUserId?: string | null;
 }
 
 export interface ReactionEvent {
@@ -149,4 +150,19 @@ export interface Notification {
   isRead: boolean;
   createdAt: string;
   link?: string;
+}
+
+export interface StreamingCredential {
+  id: string;
+  roomId: string;
+  serviceName: string;
+  accountIdentifier: string;
+  password: string;
+  profilePin?: string;
+  profileName?: string;
+  instructions?: string;
+  directUrl?: string;
+  sharedByUserId: string;
+  sharedByUsername: string;
+  createdAt: string;
 }

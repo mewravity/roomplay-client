@@ -9,6 +9,7 @@ interface RoomState {
   reactions: ReactionEvent[];
   isScreenSharing: boolean;
   screenShareUserId: string | null;
+  screenStream: MediaStream | null;
   
   setRoom: (room: RoomDetail) => void;
   setMembers: (members: RoomMember[]) => void;
@@ -17,6 +18,7 @@ interface RoomState {
   setPlaybackState: (state: PlaybackState) => void;
   addReaction: (reaction: ReactionEvent) => void;
   setScreenShare: (isSharing: boolean, userId: string | null) => void;
+  setScreenStream: (stream: MediaStream | null) => void;
   clearRoom: () => void;
 }
 
@@ -28,6 +30,7 @@ export const useRoomStore = create<RoomState>((set) => ({
   reactions: [],
   isScreenSharing: false,
   screenShareUserId: null,
+  screenStream: null,
 
   setRoom: (room) => set({ currentRoom: room }),
   setMembers: (members) => set({ members }),
@@ -36,6 +39,7 @@ export const useRoomStore = create<RoomState>((set) => ({
   setPlaybackState: (state) => set({ playbackState: state }),
   addReaction: (reaction) => set((state) => ({ reactions: [...state.reactions, reaction] })),
   setScreenShare: (isSharing, userId) => set({ isScreenSharing: isSharing, screenShareUserId: userId }),
+  setScreenStream: (stream) => set({ screenStream: stream }),
   clearRoom: () => set({
     currentRoom: null,
     members: [],
@@ -43,6 +47,7 @@ export const useRoomStore = create<RoomState>((set) => ({
     playbackState: { isPlaying: false, currentTime: 0, updatedAt: new Date().toISOString(), speed: 1 },
     reactions: [],
     isScreenSharing: false,
-    screenShareUserId: null
+    screenShareUserId: null,
+    screenStream: null
   })
 }));
